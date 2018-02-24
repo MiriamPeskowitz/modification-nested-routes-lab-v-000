@@ -22,7 +22,17 @@ class ArtistsController < ApplicationController
   end
 
   def edit
+    if params[:song_id]
+      @song = Song.find_by(:id => params[:song_id])
+      if @song.nil?
+        redirect_to songs_path, flash[:alert] = "Song not found."
+      else
+        @artist = @song.artists.find_by(id: params[:id])
+          redirect_to edit_artist_song_path(@song), flash[:alert] = "Artist not found." if @artist.nil?
+      end
+    else
     @artist = Artist.find(params[:id])
+    end
   end
 
   def update
@@ -47,6 +57,6 @@ class ArtistsController < ApplicationController
   private
 
   def artist_params
-    params.require(:artist).permit(:name)
+    params.require(:artist).permit(:name, :song_id)
   end
 end
